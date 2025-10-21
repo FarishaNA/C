@@ -1,0 +1,194 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+struct Node* head = NULL;
+
+// Create one node and return pointer
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (!newNode) {
+        printf("Memory error\n");
+        exit(1);
+    }
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Insert at beginning
+void insertAtBeginning(int data) {
+    struct Node* n = createNode(data);
+    n->next = head;
+    head = n;
+    printf("Inserted at beginning.\n");
+}
+
+// Insert at end
+void insertAtEnd(int data) {
+    struct Node* n = createNode(data);
+    if (head == NULL) {
+        head = n;
+        printf("Inserted as first node.\n");
+        return;
+    }
+    struct Node* t = head;
+    while (t->next)
+        t = t->next;
+    t->next = n;
+    printf("Inserted at end.\n");
+}
+
+// Insert at specific position (1-based)
+void insertAtPosition(int data, int position) {
+    if (position < 1) {
+        printf("Invalid position.\n");
+        return;
+    }
+    if (position == 1) {
+        insertAtBeginning(data);
+        return;
+    }
+
+    struct Node* t = head;
+    for (int i = 1; t != NULL && i < position - 1; ++i)
+        t = t->next;
+
+    if (t == NULL) {
+        printf("Invalid position.\n");
+        return;
+    }
+
+    struct Node* n = createNode(data);
+    n->next = t->next;
+    t->next = n;
+    printf("Inserted at position %d.\n", position);
+}
+
+// Delete node at position (1-based)
+void deleteAtPosition(int position) {
+    if (head == NULL) {
+        printf("List is empty.\n");
+        return;
+    }
+    if (position < 1) {
+        printf("Invalid position.\n");
+        return;
+    }
+
+    if (position == 1) {
+        struct Node* del = head;
+        head = head->next;
+        free(del);
+        printf("Deleted node at position 1.\n");
+        return;
+    }
+
+    struct Node* t = head;
+    for (int i = 1; t != NULL && i < position - 1; ++i)
+        t = t->next;
+
+    if (t == NULL || t->next == NULL) {
+        printf("Invalid position.\n");
+        return;
+    }
+
+    struct Node* del = t->next;
+    t->next = del->next;
+    free(del);
+    printf("Deleted node at position %d.\n", position);
+}
+
+// Display list
+void displayList() {
+    if (head == NULL) {
+        printf("List is empty.\n");
+        return;
+    }
+
+    struct Node* t = head;
+    printf("List: ");
+    while (t) {
+        printf("%d -> ", t->data);
+        t = t->next;
+    }
+    printf("NULL\n");
+}
+
+// Count nodes
+int countNodes() {
+    int c = 0;
+    struct Node* t = head;
+    while (t) {
+        c++;
+        t = t->next;
+    }
+    return c;
+}
+
+// Menu
+int main() {
+    int choice, data, pos;
+
+    while (1) {
+        printf("\n--- Singly Linked List Menu ---\n");
+        printf("1. Insert at Beginning\n");
+        printf("2. Insert at End\n");
+        printf("3. Insert at Position\n");
+        printf("4. Delete at Position\n");
+        printf("5. Display List\n");
+        printf("6. Count Nodes\n");
+        printf("7. Exit\n");
+        printf("Enter choice: ");
+        if (scanf("%d", &choice) != 1) {
+            printf("Invalid input\n");
+            return 0;
+        }
+
+        switch (choice) {
+            case 1:
+                printf("Enter data: ");
+                scanf("%d", &data);
+                insertAtBeginning(data);
+                break;
+
+            case 2:
+                printf("Enter data: ");
+                scanf("%d", &data);
+                insertAtEnd(data);
+                break;
+
+            case 3:
+                printf("Enter position and data: ");
+                scanf("%d %d", &pos, &data);
+                insertAtPosition(data, pos);
+                break;
+
+            case 4:
+                printf("Enter position to delete: ");
+                scanf("%d", &pos);
+                deleteAtPosition(pos);
+                break;
+
+            case 5:
+                displayList();
+                break;
+
+            case 6:
+                printf("Total nodes: %d\n", countNodes());
+                break;
+
+            case 7:
+                printf("Exiting.\n");
+                return 0;
+
+            default:
+                printf("Invalid choice.\n");
+        }
+    }
+    return 0;
+}
