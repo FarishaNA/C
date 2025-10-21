@@ -1,0 +1,157 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node *prev;
+    struct Node *next;
+};
+
+struct Node *head = NULL, *tail = NULL;
+
+// Create a new node
+struct Node* createNode(int value) {
+    struct Node *newNode = (struct Node*) malloc(sizeof(struct Node));
+    newNode->data = value;
+    newNode->prev = NULL;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Insert at beginning
+void insertAtBeginning(int value) {
+    struct Node *newNode = createNode(value);
+    if (head == NULL) head = tail = newNode;
+    else {
+        newNode->next = head;
+        head->prev = newNode;
+        head = newNode;
+    }
+}
+
+// Insert at end
+void insertAtEnd(int value) {
+    struct Node *newNode = createNode(value);
+    if (head == NULL) head = tail = newNode;
+    else {
+        tail->next = newNode;
+        newNode->prev = tail;
+        tail = newNode;
+    }
+}
+
+// Delete from beginning
+void deleteFromBeginning() {
+    if (head == NULL) {
+        printf("List empty.\n");
+        return;
+    }
+    struct Node *temp = head;
+    if (head == tail) head = tail = NULL;
+    else {
+        head = head->next;
+        head->prev = NULL;
+    }
+    free(temp);
+    printf("Deleted from beginning.\n");
+}
+
+// Delete from end
+void deleteFromEnd() {
+    if (tail == NULL) {
+        printf("List empty.\n");
+        return;
+    }
+    struct Node *temp = tail;
+    if (head == tail) head = tail = NULL;
+    else {
+        tail = tail->prev;
+        tail->next = NULL;
+    }
+    free(temp);
+    printf("Deleted from end.\n");
+}
+
+// Display from beginning
+void displayFromBeginning() {
+    struct Node *temp = head;
+    printf("List (forward): ");
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+// Display from end
+void displayFromEnd() {
+    struct Node *temp = tail;
+    printf("List (reverse): ");
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->prev;
+    }
+    printf("\n");
+}
+
+// Count nodes
+void countNodes() {
+    int count = 0;
+    struct Node *temp = head;
+    while (temp != NULL) {
+        count++;
+        temp = temp->next;
+    }
+    printf("Total nodes: %d\n", count);
+}
+
+int main() {
+    int choice, value;
+
+    while (1) {
+        printf("\n--- Doubly Linked List Menu ---\n");
+        printf("1. Insert at Beginning\n");
+        printf("2. Insert at End\n");
+        printf("3. Delete from Beginning\n");
+        printf("4. Delete from End\n");
+        printf("5. Display from Beginning\n");
+        printf("6. Display from End\n");
+        printf("7. Count Nodes\n");
+        printf("8. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter value: ");
+                scanf("%d", &value);
+                insertAtBeginning(value);
+                break;
+            case 2:
+                printf("Enter value: ");
+                scanf("%d", &value);
+                insertAtEnd(value);
+                break;
+            case 3:
+                deleteFromBeginning();
+                break;
+            case 4:
+                deleteFromEnd();
+                break;
+            case 5:
+                displayFromBeginning();
+                break;
+            case 6:
+                displayFromEnd();
+                break;
+            case 7:
+                countNodes();
+                break;
+            case 8:
+                exit(0);
+            default:
+                printf("Invalid choice.\n");
+        }
+    }
+    return 0;
+}
