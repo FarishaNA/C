@@ -1,0 +1,113 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+struct Node* top = NULL;
+
+// Create and return a node
+struct Node* createNode(int data) {
+    struct Node* n = (struct Node*)malloc(sizeof(struct Node));
+    n->data = data;
+    n->next = NULL;
+    return n;
+}
+
+// Push element onto stack
+void push(int data) {
+    struct Node* n = createNode(data);
+    n->next = top;  // link new node to previous top
+    top = n;        // update top
+    printf("Pushed %d\n", data);
+}
+
+// Pop top element
+void pop() {
+    if (top == NULL) {
+        printf("Stack underflow.\n");
+        return;
+    }
+    struct Node* temp = top;
+    printf("Popped %d\n", temp->data);
+    top = top->next; // move top down
+    free(temp);
+}
+
+// Display stack (top to bottom)
+void display() {
+    if (top == NULL) {
+        printf("Stack is empty.\n");
+        return;
+    }
+    struct Node* t = top;
+    printf("Stack (top -> bottom): ");
+    while (t) {
+        printf("%d ", t->data);
+        t = t->next;
+    }
+    printf("\n");
+}
+
+// Count elements
+int count() {
+    int c = 0;
+    struct Node* t = top;
+    while (t) {
+        c++;
+        t = t->next;
+    }
+    return c;
+}
+
+// Peek at top element
+void peek() {
+    if (top == NULL)
+        printf("Stack is empty.\n");
+    else
+        printf("Top element: %d\n", top->data);
+}
+
+// Menu-driven main
+int main() {
+    int choice, data;
+
+    while (1) {
+        printf("\n--- Stack Menu ---\n");
+        printf("1. Push\n");
+        printf("2. Pop\n");
+        printf("3. Peek\n");
+        printf("4. Display\n");
+        printf("5. Count\n");
+        printf("6. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter data: ");
+                scanf("%d", &data);
+                push(data);
+                break;
+            case 2:
+                pop();
+                break;
+            case 3:
+                peek();
+                break;
+            case 4:
+                display();
+                break;
+            case 5:
+                printf("Total elements: %d\n", count());
+                break;
+            case 6:
+                printf("Exiting.\n");
+                return 0;
+            default:
+                printf("Invalid choice.\n");
+        }
+    }
+}
