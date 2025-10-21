@@ -1,0 +1,77 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define SIZE 8  // universe size
+
+// Display bit string as set elements
+void display(int set[]) {
+    printf("{ ");
+    for (int i = 0; i < SIZE; i++) {
+        if (set[i]) printf("%d ", i);
+    }
+    printf("}\n");
+}
+
+// Union
+void unionSet(int A[], int B[], int result[]) {
+    for (int i = 0; i < SIZE; i++) result[i] = A[i] | B[i];
+}
+
+// Intersection
+void intersectionSet(int A[], int B[], int result[]) {
+    for (int i = 0; i < SIZE; i++) result[i] = A[i] & B[i];
+}
+
+// Difference A - B
+void differenceSet(int A[], int B[], int result[]) {
+    for (int i = 0; i < SIZE; i++) result[i] = A[i] & (~B[i]);
+}
+
+int main() {
+    int setA[SIZE] = {0}, setB[SIZE] = {0}, result[SIZE];
+    int choice, elem, n;
+
+    printf("Enter elements of Set A (0-%d). Enter -1 to stop:\n", SIZE-1);
+    while (1) {
+        scanf("%d", &elem);
+        if (elem == -1) break;
+        if (elem >=0 && elem < SIZE) setA[elem] = 1;
+    }
+
+    printf("Enter elements of Set B (0-%d). Enter -1 to stop:\n", SIZE-1);
+    while (1) {
+        scanf("%d", &elem);
+        if (elem == -1) break;
+        if (elem >=0 && elem < SIZE) setB[elem] = 1;
+    }
+
+    while (1) {
+        printf("\n--- Set Operations Menu ---\n");
+        printf("1. Union\n2. Intersection\n3. Difference (A-B)\n4. Display Sets\n5. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch(choice) {
+            case 1:
+                unionSet(setA, setB, result);
+                printf("A ∪ B = "); display(result);
+                break;
+            case 2:
+                intersectionSet(setA, setB, result);
+                printf("A ∩ B = "); display(result);
+                break;
+            case 3:
+                differenceSet(setA, setB, result);
+                printf("A - B = "); display(result);
+                break;
+            case 4:
+                printf("Set A = "); display(setA);
+                printf("Set B = "); display(setB);
+                break;
+            case 5:
+                exit(0);
+            default:
+                printf("Invalid choice.\n");
+        }
+    }
+}
