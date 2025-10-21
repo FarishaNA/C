@@ -3,25 +3,23 @@
 
 struct Node {
     int data;
-    struct Node *prev;
-    struct Node *next;
+    struct Node *prev, *next;
 };
 
 struct Node *head = NULL, *tail = NULL;
 
-// Create a new node
+// Create node
 struct Node* createNode(int value) {
-    struct Node *newNode = (struct Node*) malloc(sizeof(struct Node));
+    struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));
     newNode->data = value;
-    newNode->prev = NULL;
-    newNode->next = NULL;
+    newNode->prev = newNode->next = NULL;
     return newNode;
 }
 
 // Insert at beginning
 void insertAtBeginning(int value) {
     struct Node *newNode = createNode(value);
-    if (head == NULL) head = tail = newNode;
+    if (!head) head = tail = newNode;
     else {
         newNode->next = head;
         head->prev = newNode;
@@ -32,7 +30,7 @@ void insertAtBeginning(int value) {
 // Insert at end
 void insertAtEnd(int value) {
     struct Node *newNode = createNode(value);
-    if (head == NULL) head = tail = newNode;
+    if (!head) head = tail = newNode;
     else {
         tail->next = newNode;
         newNode->prev = tail;
@@ -40,9 +38,41 @@ void insertAtEnd(int value) {
     }
 }
 
+// Insert at position (1-based)
+void insertAtPosition(int pos, int value) {
+    if (pos <= 0) {
+        printf("Invalid position.\n");
+        return;
+    }
+
+    struct Node *newNode = createNode(value);
+
+    if (pos == 1) {
+        insertAtBeginning(value);
+        return;
+    }
+
+    struct Node *temp = head;
+    int i;
+    for (i = 1; temp && i < pos - 1; i++)
+        temp = temp->next;
+
+    if (!temp) {
+        printf("Position out of range.\n");
+        free(newNode);
+        return;
+    }
+
+    newNode->next = temp->next;
+    newNode->prev = temp;
+    if (temp->next) temp->next->prev = newNode;
+    else tail = newNode;
+    temp->next = newNode;
+}
+
 // Delete from beginning
 void deleteFromBeginning() {
-    if (head == NULL) {
+    if (!head) {
         printf("List empty.\n");
         return;
     }
@@ -58,7 +88,7 @@ void deleteFromBeginning() {
 
 // Delete from end
 void deleteFromEnd() {
-    if (tail == NULL) {
+    if (!tail) {
         printf("List empty.\n");
         return;
     }
@@ -72,22 +102,48 @@ void deleteFromEnd() {
     printf("Deleted from end.\n");
 }
 
-// Display from beginning
+// Delete from given position
+void deleteAtPosition(int pos) {
+    if (!head || pos <= 0) {
+        printf("Invalid operation.\n");
+        return;
+    }
+
+    struct Node *temp = head;
+    int i;
+    for (i = 1; temp && i < pos; i++)
+        temp = temp->next;
+
+    if (!temp) {
+        printf("Position out of range.\n");
+        return;
+    }
+
+    if (temp == head) head = head->next;
+    if (temp == tail) tail = tail->prev;
+    if (temp->prev) temp->prev->next = temp->next;
+    if (temp->next) temp->next->prev = temp->prev;
+
+    free(temp);
+    printf("Deleted node at position %d.\n", pos);
+}
+
+// Display forward
 void displayFromBeginning() {
     struct Node *temp = head;
     printf("List (forward): ");
-    while (temp != NULL) {
+    while (temp) {
         printf("%d ", temp->data);
         temp = temp->next;
     }
     printf("\n");
 }
 
-// Display from end
+// Display backward
 void displayFromEnd() {
     struct Node *temp = tail;
     printf("List (reverse): ");
-    while (temp != NULL) {
+    while (temp) {
         printf("%d ", temp->data);
         temp = temp->prev;
     }
@@ -98,7 +154,7 @@ void displayFromEnd() {
 void countNodes() {
     int count = 0;
     struct Node *temp = head;
-    while (temp != NULL) {
+    while (temp) {
         count++;
         temp = temp->next;
     }
@@ -106,18 +162,20 @@ void countNodes() {
 }
 
 int main() {
-    int choice, value;
+    int choice, value, pos;
 
     while (1) {
         printf("\n--- Doubly Linked List Menu ---\n");
         printf("1. Insert at Beginning\n");
         printf("2. Insert at End\n");
-        printf("3. Delete from Beginning\n");
-        printf("4. Delete from End\n");
-        printf("5. Display from Beginning\n");
-        printf("6. Display from End\n");
-        printf("7. Count Nodes\n");
-        printf("8. Exit\n");
+        printf("3. Insert at Position\n");
+        printf("4. Delete from Beginning\n");
+        printf("5. Delete from End\n");
+        printf("6. Delete from Position\n");
+        printf("7. Display from Beginning\n");
+        printf("8. Display from End\n");
+        printf("9. Count Nodes\n");
+        printf("10. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
 
@@ -133,25 +191,34 @@ int main() {
                 insertAtEnd(value);
                 break;
             case 3:
-                deleteFromBeginning();
+                printf("Enter position and value: ");
+                scanf("%d %d", &pos, &value);
+                insertAtPosition(pos, value);
                 break;
             case 4:
-                deleteFromEnd();
+                deleteFromBeginning();
                 break;
             case 5:
-                displayFromBeginning();
+                deleteFromEnd();
                 break;
             case 6:
-                displayFromEnd();
+                printf("Enter position: ");
+                scanf("%d", &pos);
+                deleteAtPosition(pos);
                 break;
             case 7:
-                countNodes();
+                displayFromBeginning();
                 break;
             case 8:
+                displayFromEnd();
+                break;
+            case 9:
+                countNodes();
+                break;
+            case 10:
                 exit(0);
             default:
                 printf("Invalid choice.\n");
         }
     }
-    return 0;
 }
