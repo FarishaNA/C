@@ -1,0 +1,146 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100  // Queue size
+
+// Node structure
+struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
+};
+
+// Queue structure
+struct Queue {
+    struct Node* arr[MAX];
+    int front, rear;
+};
+
+// Initialize queue
+void initQueue(struct Queue* q) {
+    q->front = q->rear = -1;
+}
+
+// Check if queue is empty
+int isEmpty(struct Queue* q) {
+    return q->front == -1;
+}
+
+// Enqueue
+void enqueue(struct Queue* q, struct Node* node) {
+    if (q->rear == MAX - 1) return;
+    if (q->front == -1) q->front = 0;
+    q->arr[++q->rear] = node;
+}
+
+// Dequeue
+struct Node* dequeue(struct Queue* q) {
+    if (isEmpty(q)) return NULL;
+    struct Node* node = q->arr[q->front];
+    if (q->front == q->rear) q->front = q->rear = -1;
+    else q->front++;
+    return node;
+}
+
+// Create new node
+struct Node* createNode(int value) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = value;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// Insert node in level order
+void insert(struct Node** root, int value) {
+    struct Node* newNode = createNode(value);
+    if (!*root) { *root = newNode; return; }
+
+    struct Queue q;
+    initQueue(&q);
+    enqueue(&q, *root);
+
+    while (!isEmpty(&q)) {
+        struct Node* temp = dequeue(&q);
+        if (!temp->left) { temp->left = newNode; return; }
+        else enqueue(&q, temp->left);
+
+        if (!temp->right) { temp->right = newNode; return; }
+        else enqueue(&q, temp->right);
+    }
+}
+
+// Find deepest rightmost node
+struct Node* getDeepestNode(struct Node* root, struct Node** parent) {
+    struct Queue q;
+    initQueue(&q);
+    enqueue(&q, root);
+    struct Node* temp = NULL;
+    *parent = NULL;
+
+    while (!isEmpty(&q)) {
+        temp = dequeue(&q);
+        if (temp->left) { *parent = temp; enqueue(&q, temp->left); }
+        if (temp->right) { *parent = temp; enqueue(&q, temp->right); }
+    }
+    return temp;
+}
+
+// Delete node by value
+void deleteNode(struct Node** root, int key) {
+    if (!*root) return;
+    if ((*root)->left == NULL && (*root)->right == NULL) {
+        if ((*root)->data == key) { free(*root); *root = NULL; }
+        return;
+    }
+
+    struct Queue q;
+    initQueue(&q);
+    enqueue(&q, *root);
+    struct Node* temp;
+    struct Node* keyNode = NULL;
+
+    while (!isEmpty(&q)) {
+        temp = dequeue(&q);
+        if (temp->data == key) keyNode = temp;
+        if (temp->left) enqueue(&q, temp->left);
+        if (temp->right) enqueue(&q, temp->right);
+    }
+
+    if (keyNode) {
+        struct Node* parent;
+        struct Node* deepest = getDeepestNode(*root, &parent);
+        keyNode->data = deepest->data;
+        if (parent->right == deepest) parent->right = NULL;
+        else parent->left = NULL;
+        free(deepest);
+        printf("Deleted node with value %d\n", key);
+    } else {
+        printf("Node not found.\n");
+    }
+}
+
+// Traversals
+void inorder(struct Node* root) { if(!root) return; inorder(root->left); printf("%d ", root->data); inorder(root->right); }
+void preorder(struct Node* root) { if(!root) return; printf("%d ", root->data); preorder(root->left); preorder(root->right); }
+void postorder(struct Node* root) { if(!root) return; postorder(root->left); postorder(root->right); printf("%d ", root->data); }
+
+int main() {
+    struct Node* root = NULL;
+    int choice, value;
+
+    while (1) {
+        printf("\n--- Binary Tree Menu ---\n");
+        printf("1. Insert Node\n2. Delete Node\n3. Inorder Traversal\n4. Preorder Traversal\n5. Postorder Traversal\n6. Exit\n");
+        printf("Enter choice: "); scanf("%d", &choice);
+
+        switch(choice) {
+            case 1: printf("Enter value: "); scanf("%d", &value); insert(&root, value); break;
+            case 2: printf("Enter value to delete: "); scanf("%d", &value); deleteNode(&root, value); break;
+            case 3: printf("Inorder: "); inorder(root); printf("\n"); break;
+            case 4: printf("Preorder: "); preorder(root); printf("\n"); break;
+            case 5: printf("Postorder: "); postorder(root); printf("\n"); break;
+            case 6: exit(0);
+            default: printf("Invalid choice.\n");
+        }
+    }
+}
