@@ -23,6 +23,7 @@ int main() {
     printf("Enter the source vertex (0 to %d): ", n - 1);
     scanf("%d", &source);
 
+    // Initialization
     for (i = 0; i < n; i++) {
         dist[i] = cost[source][i];
         visited[i] = 0;
@@ -56,7 +57,7 @@ int main() {
         count++;
     }
 
-    //Output shortest distances
+    // Output results
     printf("\nShortest distances from source %d:\n", source);
     for (i = 0; i < n; i++) {
         printf("Vertex %d : %d\n", i, dist[i]);
